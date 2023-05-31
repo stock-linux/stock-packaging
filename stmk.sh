@@ -110,7 +110,7 @@ build() {
 pack() {
     cd $PKG
     # Remove unneeded and harmful LA files
-    if [ $KEEP_LA==true ]; then
+    if [ "$KEEP_LA" != "" ] && $KEEP_LA; then
         for file in $(find $directory -type f -name "*.la");
         do
             echo $file
