@@ -5,7 +5,7 @@
 # License: GNU GENERAL PUBLIC LICENSE v3     #
 ##############################################
 
-source '$("dirname -- "$0")/../utils.sh'
+source "$(dirname -- "$0")/../utils.sh"
 
 check_variables() {
     ERROR=false
