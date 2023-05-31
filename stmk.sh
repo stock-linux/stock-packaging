@@ -66,13 +66,15 @@ print_header_end() {
 
 print_help() {
     print_header "Help:"
+    print_content ""
+    print_content "stmk -k => Keep build files"
+    print_content "stmk help | -h => Show this help menu"
+    print_content ""
+    print_content ""
+    print_content "Environment variables:"
+    print_content ""
+    print_content "VERBOSE=bool  => Show build output ?"
     print_header_end
-    echo ""
-    echo "stmk -k => Keep build files"
-    echo "stmk help | -h => Show this help menu"
-    echo ""
-    echo "Environment variables:"
-    echo "VERBOSE=true|false => Show build output in term or not" 
 }
 
 print_error() {
