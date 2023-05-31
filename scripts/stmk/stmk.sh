@@ -82,6 +82,7 @@ pack() {
     fi
 
     find . > .FILETREE
+    echo "$name|$version|$release|$description|$packager|$checksum|$(IFS=,; printf '%s' "${DEPS[*]}")" > .PKGINDEX
     tar -I 'zstd --ultra -22' -cf ../$name-$version.tar.zst .
 }
 
