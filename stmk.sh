@@ -84,6 +84,8 @@ print_variables() {
     print_content "Package name: $name"
     print_content "Package version: $version"
     print_content "Package description: $description"
+    print_content ""
+    print_content "Workdir: $WORKDIR"
     print_header_end
 }
 
@@ -135,6 +137,8 @@ case "$1" in
         # Print package information
         print_variables
 
+        echo ""
+
         # Download sources
         for sourceURL in ${source[@]};
         do
@@ -147,5 +151,20 @@ case "$1" in
 
             curl -o $FILENAME $URL
         done
+
+        echo ""
+
+        PKG=$WORKDIR/dist
+        mkdir $PKG
+
+        unpack
+        build
+        
+        if [ $? == 1 ]; then
+            print_error "An error occured during the build process. Please check the logs."
+            exit 1
+        fi
+
+        pack
         ;;
 esac
