@@ -207,5 +207,6 @@ case "$1" in
         cp $WORKDIR/$name-$version.tar.zst $BASEDIR/$name-$version.tar.zst
         checksum=$(md5sum $BASEDIR/$name-$version.tar.zst | cut -d ' ' -f 1)
         echo "$name|$version|$release|$description|$packager|$checksum|$(IFS=,; printf '%s' "${DEPS[*]}")" > .PKGINDEX
+        rm -rf $WORKDIR
         ;;
 esac
