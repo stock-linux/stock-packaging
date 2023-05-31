@@ -71,6 +71,8 @@ print_help() {
     echo "stmk -k => Keep build files"
     echo "stmk help | -h => Show this help menu"
     echo ""
+    echo "Environment variables:"
+    echo "VERBOSE=true|false => Show build output in term or not" 
 }
 
 print_error() {
@@ -157,7 +159,15 @@ case "$1" in
         mkdir $PKG
 
         unpack
-        build
+        if [ "$STMK_DIR" != "" ]; then
+            build &> $STMK_DIR/logs/$name-build-$(date '+%Y-%m-%d--%H:%M').out
+        else
+            if [ "$VERBOSE" != "" ] && $VERBOSE; then
+                build
+            else
+                build &> /dev/null
+            fi
+        fi
 
         if [ $? != 0 ]; then
             print_error "An error occured during the build process. Please check the logs."
