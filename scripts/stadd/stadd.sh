@@ -19,3 +19,8 @@ print_help() {
 if [ "$1" == "help" ] || [ "$1" == "-h" ]; then
     print_help
 fi
+
+if ! [ -f "$1" ]; then
+    print_error "The provided file does not exist !"
+    exit 1
+fi
