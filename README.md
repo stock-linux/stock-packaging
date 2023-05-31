@@ -1,2 +1,2 @@
-# stmk
-Stock Linux make/build system
+# stock-packaging
+Stock Linux packaging system.
