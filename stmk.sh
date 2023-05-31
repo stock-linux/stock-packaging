@@ -104,7 +104,7 @@ unpack() {
 }
 
 build() {
-    ./configure --prefix=/usr --disable-static
+    ./configure --prefix=/usr
     make
     make DESTDIR=$PKG install
 }
