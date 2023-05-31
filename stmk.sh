@@ -140,15 +140,14 @@ read_elf_deps() {
                     fi
 
                     if [ "$(cat $package/FILETREE | grep $library)" != "" ]; then
-                        if ! [[ " ${DEPS[*]} " == *" $package "* ]]; then
-                            DEPS+=$PACKAGE_NAME
+                        if ! [[ " ${DEPS[*]} " == *" $PACKAGE_NAME "* ]]; then
+                            DEPS+="$PACKAGE_NAME"
                         fi
                     fi
                 done
             done
         fi
     done
-    return $DEPS
 }
 
 # CLI parser
@@ -206,7 +205,15 @@ case "$1" in
             exit 1
         fi
 
+        DEPS=()
+        if [ "$INSTALLED_PACKAGES_DIR" != "" ]; then
+            read_elf_deps
+        fi
+        
         pack
+        cd $BASEDIR
         cp $WORKDIR/$name-$version.tar.zst $BASEDIR/$name-$version.tar.zst
+        checksum=$(md5sum $BASEDIR/$name-$version.tar.zst | cut -d ' ' -f 1)
+        echo "$name|$version|$release|$description|$packager|$checksum|$(IFS=,; printf '%s' "${DEPS[*]}")" > .PKGINDEX
         ;;
 esac
