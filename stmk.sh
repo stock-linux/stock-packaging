@@ -5,6 +5,50 @@
 # License: GNU GENERAL PUBLIC LICENSE v3     #
 ##############################################
 
+check_variables() {
+    ERROR=false
+    if [ "$name" == "" ]; then
+        print_error "Package name not set !"
+        ERROR=true
+    fi
+
+    if [ "$version" == "" ]; then
+        print_error "Package version not set !"
+        ERROR=true
+    fi
+
+    if [ "$release" == "" ]; then
+        print_error "Package release not set !"
+    fi
+
+    if [ "$description" == "" ]; then
+        print_error "Package description not set !"
+        ERROR=true
+    fi
+
+    if [ "$source" == "" ]; then
+        print_error "Package source not set !"
+        ERROR=true
+    fi
+
+    if [ "$packager" == "" ]; then
+        print_error "Packager not set !"
+        ERROR=true
+    fi
+
+    if [ "$depends" == "" ]; then
+        if $ERROR; then
+            echo ""
+        fi
+        print_warning "No compilation dependencies."
+        echo ""
+    fi
+
+    if $ERROR ; then
+        exit 1
+    fi
+}
+
 print_header() {
     echo "========================STMK========================"
     spaces=$((48 - ${#1}))
@@ -28,6 +72,23 @@ print_help() {
     echo "stmk -v => Show logs on current terminal"
     echo "stmk help | -h => Show this help menu"
     echo ""
+}
+
+print_error() {
+    echo -e "\e[1;31m$1\e[0m"
+}
+
+print_variables() {
+    print_header "Package information:"
+    print_content ""
+    print_content "Package name: $name"
+    print_content "Package version: $version"
+    print_content "Package description: $description"
+    print_header_end
+}
+
+print_warning() {
+    echo -e "\e[1;33m$1\e[0m"
 }
 
 unpack() {
@@ -68,6 +129,13 @@ case "$1" in
         source ./recipe
         WORKDIR=$(mktemp -d)
         cd $WORKDIR
+        # Check the presence of needed variables
+        check_variables
+
+        # Print package information
+        print_variables
+
+        # Download sources
         for sourceURL in ${source[@]};
         do
             URL=$(echo ${sourceURL} | cut -d "#" -f 1)
@@ -77,9 +145,6 @@ case "$1" in
                 FILENAME=$(echo ${sourceURL} | cut -d "#" -f 2)
             fi
 
-            echo $URL
-            echo $FILENAME
-            echo ""
             curl -o $FILENAME $URL
         done
         ;;
