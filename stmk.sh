@@ -67,7 +67,6 @@ case "$1" in
     *)
         source ./recipe
         WORKDIR=$(mktemp -d)
-        source=(http://downloads.nutyx.org/x86_64/rolling/base/acl/acl1626618727x86_64.cards.tar.xz http://downloads.nutyx.org/x86_64/rolling/base/attr/attr1626618688x86_64.cards.tar.xz#attr.tar.xz)
         cd $WORKDIR
         for sourceURL in ${source[@]};
         do
