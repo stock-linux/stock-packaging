@@ -112,14 +112,15 @@ build() {
 pack() {
     cd $PKG
     # Remove unneeded and harmful LA files
-    if [ "$KEEP_LA" != "" ] && $KEEP_LA; then
-        for file in $(find $directory -type f -name "*.la");
+    if [ "$KEEP_LA" == "" ] || !$KEEP_LA; then
+        for file in $(find . -type f -name "*.la");
         do
-            echo $file
+            rm $file
         done
     fi
 
-    tar -I 'zstd --ultra -22' -cf ../$name-$version.tar.zst $PKG
+    find . > .FILETREE
+    tar -I 'zstd --ultra -22' -cf ../$name-$version.tar.zst .
 }
 
 # CLI parser
