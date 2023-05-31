@@ -132,6 +132,7 @@ case "$1" in
         print_help
         ;;
     *)
+        BASEDIR=$PWD
         source ./recipe
         WORKDIR=$(mktemp -d)
         cd $WORKDIR
@@ -178,5 +179,6 @@ case "$1" in
         fi
 
         pack
+        cp $WORKDIR/$name-$version.tar.zst $BASEDIR/$name-$version.tar.zst
         ;;
 esac
