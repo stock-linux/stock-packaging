@@ -69,7 +69,6 @@ print_help() {
     print_header_end
     echo ""
     echo "stmk -k => Keep build files"
-    echo "stmk -v => Show logs on current terminal"
     echo "stmk help | -h => Show this help menu"
     echo ""
 }
@@ -159,8 +158,8 @@ case "$1" in
 
         unpack
         build
-        
-        if [ $? == 1 ]; then
+
+        if [ $? != 0 ]; then
             print_error "An error occured during the build process. Please check the logs."
             exit 1
         fi
