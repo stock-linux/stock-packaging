@@ -123,6 +123,34 @@ pack() {
     tar -I 'zstd --ultra -22' -cf ../$name-$version.tar.zst .
 }
 
+read_elf_deps() {
+    DEPS=()
+    for file in $(find);
+    do
+        FILETYPE=$(file $file | cut -d ' ' -f 2)
+        if [ "$FILETYPE" == "ELF" ]; then
+            ARCH=$(file $file | cut -d ' ' -f 3)
+            LIBRARIES=$(readelf -d $file | grep 'NEEDED' | cut -d ':' -f 2 | cut -d '[' -f 2 | cut -d ']' -f 1)
+            for library in $LIBRARIES; do
+                for package in $INSTALLED_PACKAGES_DIR/*;
+                do
+                    PACKAGE_NAME=$(basename $package)
+                    if ([ "$ARCH" == "64-bit" ] && [[ "$PACKAGE_NAME" == "lib32-"* ]]) || ([ "$ARCH" == "32-bit" ] && [[ "$PACKAGE_NAME" != "lib32-"* ]]); then
+                        continue
+                    fi
+
+                    if [ "$(cat $package/FILETREE | grep $library)" != "" ]; then
+                        if ! [[ " ${DEPS[*]} " == *" $package "* ]]; then
+                            DEPS+=$PACKAGE_NAME
+                        fi
+                    fi
+                done
+            done
+        fi
+    done
+    return $DEPS
+}
+
 # CLI parser
 case "$1" in
     "help")
