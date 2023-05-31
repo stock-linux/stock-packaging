@@ -24,3 +24,9 @@ if ! [ -f "$1" ]; then
     print_error "The provided file does not exist !"
     exit 1
 fi
+
+FILE=$(realpath $1)
+
+if [ "$ROOT" == "" ]; then
+    ROOT="/"
+fi
