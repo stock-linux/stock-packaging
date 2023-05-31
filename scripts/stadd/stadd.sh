@@ -26,7 +26,22 @@ if ! [ -f "$1" ]; then
 fi
 
 FILE=$(realpath $1)
+PACKAGE=${FILE/.tar.zst/}
+PACKAGE_NAME=$(echo $1 | cut -d "-" -f 1)
+PACKAGE_VERSION=$(echo $1 | cut -d "-" -f 2)
 
 if [ "$ROOT" == "" ]; then
     ROOT="/"
 fi
+
+cd $ROOT
+print_info "Installing package $PACKAGE_NAME-$PACKAGE_VERSION..."
+echo ""
+tar -xhpf $FILE
+
+mkdir -p $ROOT/var/packages/$PACKAGE_NAME
+mv .FILETREE $ROOT/var/packages/$PACKAGE_NAME/FILETREE
+mv .PKGINDEX $ROOT/var/packages/$PACKAGE_NAME/PKGINDEX
+echo $(cat $ROOT/var/packages/$PACKAGE_NAME/PKGINDEX) >> $ROOT/var/packages/INDEX
+
+print_success "Done !"
