@@ -36,14 +36,6 @@ check_variables() {
         ERROR=true
     fi
 
-    if [ "$depends" == "" ]; then
-        if $ERROR; then
-            echo ""
-        fi
-        print_warning "No compilation dependencies."
-        echo ""
-    fi
-
     if $ERROR ; then
         exit 1
     fi
