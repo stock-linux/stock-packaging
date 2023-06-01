@@ -28,20 +28,44 @@ fi
 FILE=$(realpath $1)
 PACKAGE=${FILE/.tar.zst/}
 PACKAGE_NAME=$(echo $1 | cut -d "-" -f 1)
-PACKAGE_VERSION=$(echo $1 | cut -d "-" -f 2)
+PACKAGE_VERSION=$(echo $1 | cut -d "-" -f 2 | sed 's/.tar.zst//')
 
 if [ "$ROOT" == "" ]; then
     ROOT="/"
 fi
 
 cd $ROOT
-print_info "Installing package $PACKAGE_NAME-$PACKAGE_VERSION..."
+
+if [ -d $ROOT/var/packages/$PACKAGE_NAME ] && [ "$2" != "-u" ]; then
+    print_error "Package $PACKAGE_NAME is already installed !"
+    exit 1
+elif [ "$2" == "-u" ]; then
+    OLD_PACKAGE_VERSION=$(cat $ROOT/var/packages/$PACKAGE_NAME/PKGINDEX | cut -d '|' -f 2)
+    print_info "Updating package $PACKAGE_NAME from $OLD_PACKAGE_VERSION to $PACKAGE_VERSION..."
+else
+    print_info "Installing package $PACKAGE_NAME-$PACKAGE_VERSION..."
+fi
+
 echo ""
 tar -xhpf $FILE
+
+if [ "$2" == "-u" ]; then
+    for line in $(cat $ROOT/var/packages/$PACKAGE_NAME/FILETREE);
+    do
+        if [ "$line" == "./.FILETREE"* ] || [ "$line" == "./.PKGINDEX"* ] || [ "$line" == "." ]; then
+            continue
+        fi
+
+        if [ "$(cat ./.FILETREE | grep $line)" == "" ]; then
+            rm -rf $line
+        fi
+    done
+
+    rm -rf $ROOT/var/packages/$PACKAGE_NAME
+fi
 
 mkdir -p $ROOT/var/packages/$PACKAGE_NAME
 mv .FILETREE $ROOT/var/packages/$PACKAGE_NAME/FILETREE
 mv .PKGINDEX $ROOT/var/packages/$PACKAGE_NAME/PKGINDEX
-echo $(cat $ROOT/var/packages/$PACKAGE_NAME/PKGINDEX) >> $ROOT/var/packages/INDEX
 
 print_success "Done !"
