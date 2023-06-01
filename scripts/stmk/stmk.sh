@@ -86,13 +86,11 @@ pack() {
     tar -I 'zstd --ultra -22' -cf ../$name-$version.tar.zst .
 }
 
-read_elf_deps() {
-    DEPS=()
+strip_files() {
+    cd $PKG
     for file in $(find);
     do
-        FILETYPE=$(file $file | cut -d ' ' -f 2)
-        if [ "$FILETYPE" == "ELF" ]; then
-            case $(file -b "$file") in
+        case $(file -b "$file") in
             *ELF*executable*not\ stripped)
                 strip --strip-all "$file"
                 ;;
@@ -101,7 +99,17 @@ read_elf_deps() {
                 ;;
             current\ ar\ archive)
                 strip --strip-debug "$file"
-            esac
+        esac
+    done
+}
+
+read_elf_deps() {
+    cd $PKG
+    DEPS=()
+    for file in $(find);
+    do
+        FILETYPE=$(file $file | cut -d ' ' -f 2)
+        if [ "$FILETYPE" == "ELF" ]; then
             ARCH=$(file $file | cut -d ' ' -f 3)
             LIBRARIES=$(readelf -d $file | grep 'NEEDED' | cut -d ':' -f 2 | cut -d '[' -f 2 | cut -d ']' -f 1)
             for library in $LIBRARIES; do
@@ -181,6 +189,10 @@ case "$1" in
         DEPS=()
         if [ "$INSTALLED_PACKAGES_DIR" != "" ]; then
             read_elf_deps
+        fi
+        
+        if [ "$NO_STRIP" == "" ]; then
+            strip_files
         fi
         
         pack
