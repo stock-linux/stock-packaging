@@ -92,6 +92,16 @@ read_elf_deps() {
     do
         FILETYPE=$(file $file | cut -d ' ' -f 2)
         if [ "$FILETYPE" == "ELF" ]; then
+            case $(file -b "$file") in
+            *ELF*executable*not\ stripped)
+                strip --strip-all "$file"
+                ;;
+            *ELF*shared\ object*not\ stripped)
+                strip --strip-unneeded "$file"
+                ;;
+            current\ ar\ archive)
+                strip --strip-debug "$file"
+            esac
             ARCH=$(file $file | cut -d ' ' -f 3)
             LIBRARIES=$(readelf -d $file | grep 'NEEDED' | cut -d ':' -f 2 | cut -d '[' -f 2 | cut -d ']' -f 1)
             for library in $LIBRARIES; do
