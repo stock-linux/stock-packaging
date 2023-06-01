@@ -21,6 +21,7 @@ check_variables() {
 
     if [ "$release" == "" ]; then
         print_error "Package release not set !"
+        ERROR=true
     fi
 
     if [ "$description" == "" ]; then
