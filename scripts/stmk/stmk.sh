@@ -162,7 +162,7 @@ case "$1" in
                 FILENAME=$(echo ${sourceURL} | cut -d "#" -f 2)
             fi
 
-            curl -o $FILENAME $URL
+            curl -L -o $FILENAME $URL
         done
 
         echo ""
