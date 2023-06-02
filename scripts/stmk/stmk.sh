@@ -132,6 +132,10 @@ read_elf_deps() {
     done
 }
 
+post_build() {
+    return 0
+}
+
 # CLI parser
 case "$1" in
     "help")
@@ -179,11 +183,14 @@ case "$1" in
         
         if [ "$STMK_DIR" != "" ]; then
             build &> $STMK_DIR/logs/$name-build-$(date '+%Y-%m-%d--%H:%M').out
+            post_build &> $STMK_DIR/logs/$name-postbuild-$(date '+%Y-%m-%d--%H:%M').out
         else
             if [ "$VERBOSE" != "" ] && $VERBOSE; then
                 build
+                post_build
             else
                 build &> /dev/null
+                post_build &> /dev/null
             fi
         fi
 
