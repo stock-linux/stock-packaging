@@ -172,6 +172,11 @@ case "$1" in
         mkdir $PKG
 
         unpack
+        if [ "$JOBS" != "" ]; then
+            export MAKEFLAGS="-j$JOBS"
+            export NINJAJOBS=$JOBS
+        fi
+        
         if [ "$STMK_DIR" != "" ]; then
             build &> $STMK_DIR/logs/$name-build-$(date '+%Y-%m-%d--%H:%M').out
         else
