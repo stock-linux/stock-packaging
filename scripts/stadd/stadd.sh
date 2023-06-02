@@ -26,9 +26,9 @@ if ! [ -f "$1" ]; then
 fi
 
 FILE=$(realpath $1)
-PACKAGE=${FILE/.tar.zst/}
-PACKAGE_NAME=$(echo $1 | cut -d "-" -f 1)
-PACKAGE_VERSION=$(echo $1 | cut -d "-" -f 2 | sed 's/.tar.zst//')
+PACKAGE=$(basename $FILE .tar.zst | rev)
+PACKAGE_VERSION=$(echo $PACKAGE | cut -d "-" -f 1 | rev)
+PACKAGE_NAME=$(echo $PACKAGE_VERSION | rev | sed "s/-$PACKAGE_VERSION//")
 
 if [ "$ROOT" == "" ]; then
     ROOT="/"
