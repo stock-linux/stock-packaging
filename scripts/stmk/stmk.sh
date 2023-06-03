@@ -148,6 +148,18 @@ case "$1" in
     "-h")
         print_help
         ;;
+    "c")
+	mkdir $2
+	all_args=("$@")
+	cat > $2/recipe <<EOF
+name=$2
+version=$3
+release=1
+description="${all_args[@]:4}"
+source=($(echo $4 | sed "s/$3/\$version/g" | sed "s/$2/\$name/g"))
+packager=$PACKAGER
+EOF
+        ;;
     *)
         BASEDIR=$PWD
         source ./recipe
