@@ -67,7 +67,7 @@ unpack() {
 }
 
 build() {
-    ./configure --prefix=/usr --disable-static || ./configure --prefix=/usr
+    [ -f Makefile ] || ./configure --prefix=/usr --disable-static || ./configure --prefix=/usr
     make
     make DESTDIR=$PKG install
 }
