@@ -56,7 +56,7 @@ if [ "$2" == "-u" ]; then
             continue
         fi
 
-        if [ "$(cat ./.FILETREE | grep $line)" == "" ]; then
+        if [ "$(cat ./.FILETREE | grep -F $line)" == "" ]; then
             rm -rf $line
         fi
     done
