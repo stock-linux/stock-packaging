@@ -72,6 +72,11 @@ build() {
     make DESTDIR=$PKG install
 }
 
+build_python() {
+    PYTHONPATH=src pip3 $name -w dist --no-build-isolation --no-deps $PWD
+    pip3 install --root=$PKG --no-index --find-links=dist $name
+}
+
 pack() {
     cd $PKG
     # Remove unneeded and harmful LA files
