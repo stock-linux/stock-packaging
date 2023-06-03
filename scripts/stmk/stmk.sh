@@ -132,6 +132,10 @@ read_elf_deps() {
     done
 }
 
+pre_build() {
+    return 0
+}
+
 post_build() {
     return 0
 }
@@ -176,6 +180,7 @@ case "$1" in
         mkdir $PKG
 
         unpack
+        pre_build
         if [ "$JOBS" != "" ]; then
             export MAKEFLAGS="-j$JOBS"
             export NINJAJOBS=$JOBS
