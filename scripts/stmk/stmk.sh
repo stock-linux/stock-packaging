@@ -73,7 +73,7 @@ build() {
 }
 
 build_python() {
-    PYTHONPATH=src pip3 $name -w dist --no-build-isolation --no-deps $PWD
+    PYTHONPATH=src pip3 wheel -w dist --no-build-isolation --no-deps $PWD
     pip3 install --root=$PKG --no-index --find-links=dist $name
 }
 
