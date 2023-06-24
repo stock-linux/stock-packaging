@@ -214,6 +214,10 @@ EOF
         if [ "$INSTALLED_PACKAGES_DIR" != "" ]; then
             read_elf_deps
         fi
+
+        if [ "$run" != "" ]; then
+            DEPS+=(${run[@]})
+        fi
         
         if [ "$NO_STRIP" == "" ]; then
             strip_files
