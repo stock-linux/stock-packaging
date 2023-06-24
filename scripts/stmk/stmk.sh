@@ -157,7 +157,7 @@ post_build() {
 
 # CLI parser
 case "$1" in
-    "c")
+    "c"|"create")
 	mkdir $2
 	all_args=("$@")
 	cat > $2/recipe <<EOF
