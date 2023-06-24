@@ -250,6 +250,10 @@ EOF
             strip_files
         fi
         
+        if [ -f $BASEDIR/post-install ]; then
+            cp $BASEDIR/post-install $PKG/.post-install
+        fi
+        
         pack
         cd $BASEDIR
         cp $WORKDIR/$name-$version.tar.zst $BASEDIR/$name-$version.tar.zst
