@@ -209,15 +209,26 @@ EOF
 
         if [ "$VERBOSE" != "" ] && $VERBOSE; then
             build
+            if [ $? != 0 ]; then
+                print_error "An error occured during the build process. Please check the logs."
+                exit 1
+            fi
             post_build
+            if [ $? != 0 ]; then
+                print_error "An error occured during the post-build process. Please check the logs."
+                exit 1
+            fi
         else
             build &> /dev/null
+            if [ $? != 0 ]; then
+                print_error "An error occured during the build process. Please check the logs."
+                exit 1
+            fi
             post_build &> /dev/null
-        fi
-
-        if [ $? != 0 ]; then
-            print_error "An error occured during the build process. Please check the logs."
-            exit 1
+            if [ $? != 0 ]; then
+                print_error "An error occured during the post-build process. Please check the logs."
+                exit 1
+            fi
         fi
 
         DEPS=()
