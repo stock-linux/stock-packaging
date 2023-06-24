@@ -45,14 +45,14 @@ check_variables() {
 }
 
 print_variables() {
-    print_header "Package information:"
-    print_content ""
-    print_content "Package name: $name"
-    print_content "Package version: $version"
-    print_content "Package description: $description"
-    print_content ""
-    print_content "Workdir: $WORKDIR"
-    print_header_end
+    echo "Package information:"
+    echo ""
+    echo "Package name: $name"
+    echo "Package version: $version"
+    echo "Package description: $description"
+    echo ""
+    echo "Workdir: $WORKDIR"
+    echo ""
 }
 
 print_warning() {
@@ -147,12 +147,6 @@ post_build() {
 
 # CLI parser
 case "$1" in
-    "help")
-        print_help
-        ;;
-    "-h")
-        print_help
-        ;;
     "c")
 	mkdir $2
 	all_args=("$@")
