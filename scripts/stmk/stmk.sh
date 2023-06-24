@@ -173,7 +173,9 @@ EOF
         BASEDIR=$PWD
         source ./recipe
         WORKDIR=$(mktemp -d)
-        cd $WORKDIR
+        SRC=$WORKDIR/src
+        mkdir $SRC
+        cd $SRC
         # Check the presence of needed variables
         check_variables
 
