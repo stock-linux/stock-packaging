@@ -5,7 +5,17 @@
 # License: GNU GENERAL PUBLIC LICENSE v3     #
 ##############################################
 
-source "$(dirname -- "$0")/../utils.sh"
+print_info() {
+    echo -e "\e[1;34m$1\e[0m"
+}
+
+print_error() {
+    echo -e "\e[1;31m$1\e[0m"
+}
+
+print_success() {
+    echo -e "\e[1;32m$1\e[0m"
+}
 
 if ! [ -f "$1" ]; then
     print_error "The provided file does not exist !"
