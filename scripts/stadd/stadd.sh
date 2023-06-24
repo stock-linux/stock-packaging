@@ -37,6 +37,7 @@ echo ""
 tar -xhpf $FILE
 
 if [ "$2" == "-u" ]; then
+    dirs_to_remove=()
     for line in $(cat $ROOT/var/packages/$PACKAGE_NAME/FILETREE);
     do
         if [ "$line" == "./.FILETREE"* ] || [ "$line" == "./.PKGINDEX"* ] || [ "$line" == "." ]; then
@@ -44,7 +45,18 @@ if [ "$2" == "-u" ]; then
         fi
 
         if [ "$(cat ./.FILETREE | grep -F $line)" == "" ]; then
-            rm -rf $line
+            if [ -d $line ]; then
+                dirs_to_remove+=($line)
+            else
+                rm -f $line
+            fi
+        fi
+    done
+
+    for dir in ${dirs_to_remove[@]};
+    do
+        if [ -z "$(ls -A -- "$dir")" ]; then
+            rm -d $dir
         fi
     done
 
