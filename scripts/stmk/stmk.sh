@@ -194,8 +194,12 @@ EOF
                 FILENAME=$(echo ${sourceURL} | cut -d "#" -f 2)
             fi
 
-            curl -L -o $FILENAME $URL
-        done
+            if [ "$SOURCES_DIR" == "" ]; then
+                curl -L -o $FILENAME $URL
+            else
+                cp $SOURCES_DIR/$FILENAME .
+            fi
+        done            
 
         echo ""
 
