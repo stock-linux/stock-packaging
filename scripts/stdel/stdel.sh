@@ -22,6 +22,8 @@ if [ "$1" == "" ]; then
     exit 1
 fi
 
+PACKAGE_NAME=$1
+
 if [ "$ROOT" == "" ]; then
     ROOT="/"
 fi
