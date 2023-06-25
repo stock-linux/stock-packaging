@@ -17,6 +17,11 @@ print_success() {
     echo -e "\e[1;32m$1\e[0m"
 }
 
+if [ "$1" == "" ]; then
+    print_error "You must provide a package name."
+    exit 1
+fi
+
 if [ "$ROOT" == "" ]; then
     ROOT="/"
 fi
