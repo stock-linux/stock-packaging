@@ -81,9 +81,20 @@ unpack() {
 }
 
 build() {
-    [ -f Makefile ] || ./configure --prefix=/usr --disable-static || ./configure --prefix=/usr
-    make
-    make DESTDIR=$PKG install
+    if [[ "$name" == "lib32"* ]]; then
+        CFLAGS+=" -m32" CXXFLAGS+=" -m32" \
+        ./configure --prefix=/usr \
+            --libdir=/usr/lib32 --disable-static || CFLAGS+=" -m32" CXXFLAGS+=" -m32" ./configure --prefix=/usr --libdir=/usr/lib32
+        make
+        make DESTDIR=$PWD/DESTDIR install
+        mkdir -p $PKG/usr/lib32
+        cp -Rv DESTDIR/usr/lib32/* $PKG/usr/lib32
+        rm -rf DESTDIR
+    else
+        ./configure --prefix=/usr --disable-static || ./configure --prefix=/usr
+        make
+        make DESTDIR=$PKG install
+    fi
 }
 
 build_python() {
@@ -133,7 +144,7 @@ read_elf_deps() {
             ARCH=$(file $file | cut -d ' ' -f 3)
             LIBRARIES=$(readelf -d $file | grep 'NEEDED' | cut -d ':' -f 2 | cut -d '[' -f 2 | cut -d ']' -f 1)
             for library in $LIBRARIES; do
-                for package in $INSTALLED_PACKAGES_DIR/*;
+                for package in /var/packages/*;
                 do
                     PACKAGE_NAME=$(basename $package)
                     if ([ "$ARCH" == "64-bit" ] && [[ "$PACKAGE_NAME" == "lib32-"* ]]) || ([ "$ARCH" == "32-bit" ] && [[ "$PACKAGE_NAME" != "lib32-"* ]]); then
@@ -246,9 +257,7 @@ EOF
         fi
 
         DEPS=()
-        if [ "$INSTALLED_PACKAGES_DIR" != "" ]; then
-            read_elf_deps
-        fi
+        read_elf_deps
 
         if [ "$run" != "" ]; then
             DEPS+=(${run[@]})
