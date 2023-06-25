@@ -70,9 +70,13 @@ print_warning() {
 }
 
 unpack() {
-    tar -xf $name-$version.tar.*
-    if [ -d $name-$version ]; then
-        cd $name-$version
+    pkgname=$name
+    if [[ "$name" == "lib32"* ]]; then
+        pkgname=${name//"lib32-"/}
+    fi
+    tar -xf $pkgname-$version.tar.*
+    if [ -d $pkgname-$version ]; then
+        cd $pkgname-$version
     fi
 }
 
@@ -195,7 +199,11 @@ EOF
             fi
 
             if [ "$SOURCES_DIR" == "" ]; then
-                curl -L -o $FILENAME $URL
+                if [ ! -f $BASEDIR/$FILENAME ]; then
+                    curl -L -o $FILENAME $URL
+                else
+                    cp $BASEDIR/$FILENAME .
+                fi
             else
                 cp $SOURCES_DIR/$FILENAME .
             fi
