@@ -152,9 +152,14 @@ read_elf_deps() {
                     fi
 
                     if [ "$(cat $package/FILETREE | grep $library)" != "" ]; then
-                        if ! [[ " ${DEPS[*]} " == *" $PACKAGE_NAME "* ]]; then
-                            DEPS+="$PACKAGE_NAME"
-                        fi
+                        for dep in "${DEPS[@]}"
+                        do
+                            if [ "$dep" == "$PACKAGE_NAME" ] ; then
+                                continue 2
+                            fi
+                        done
+
+                        DEPS+=($PACKAGE_NAME)
                     fi
                 done
             done
