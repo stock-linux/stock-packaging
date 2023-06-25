@@ -76,5 +76,9 @@ fi
 mkdir -p $ROOT/var/packages/$PACKAGE_NAME
 mv .FILETREE $ROOT/var/packages/$PACKAGE_NAME/FILETREE
 mv .PKGINDEX $ROOT/var/packages/$PACKAGE_NAME/PKGINDEX
+if [ -f $ROOT/.post-install ]; then
+    chroot $ROOT /.post-install
+    rm $ROOT/.post-install
+fi
 
 print_success "Done !"
