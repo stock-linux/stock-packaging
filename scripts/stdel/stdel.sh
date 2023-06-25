@@ -32,7 +32,7 @@ print_info "Deleting package $PACKAGE_NAME..."
 dirs_to_remove=()
 for line in $(cat $ROOT/var/packages/$PACKAGE_NAME/FILETREE);
 do
-    if [ "$line" == "./.FILETREE"* ] || [ "$line" == "./.PKGINDEX"* ] || [ "$line" == "." ]; then
+    if [ "$line" == "./.FILETREE"* ] || [ "$line" == "./.PKGINDEX"* ] || [ "$line" == "./.post-install"* ] || [ "$line" == "." ]; then
         continue
     fi
 
