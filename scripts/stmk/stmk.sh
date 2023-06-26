@@ -98,8 +98,8 @@ build() {
 }
 
 build_python() {
-    PYTHONPATH=src pip3 wheel -w dist --no-build-isolation --no-deps $PWD
-    pip3 install --root=$PKG --no-index --find-links=dist $name
+    python setup.py build
+    python setup.py install --root=$PKG
 }
 
 pack() {
