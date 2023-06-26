@@ -34,8 +34,129 @@ read_deps_from_index() {
     IFS=',' read -r -a deps <<< "$(cat $1 | cut -d '|' -f 7)"
 }
 
+check_pkg_or_list_exists() {
+    PACKAGE_TYPE="none"
+    for repo in $ROOT/var/squirrel/repos/*; do
+        while IFS= read -r line; do
+            if [[ "$line" == "$1 "* ]]; then
+                PACKAGE_TYPE="pkg"
+                PACKAGE_NAME=$(echo $line | cut -d ' ' -f 1)
+                PACKAGE_VERSION=$(echo $line | cut -d ' ' -f 2)
+                PACKAGE_SUBPATH=$(echo $line | cut -d ' ' -f 3)
+                PACKAGE_REPO=$(basename $repo)
+            fi
+            if [[ "$line" == "$1" ]]; then
+                PACKAGE_TYPE="list"
+                PACKAGE_REPO=$(basename $repo)
+            fi
+        done < $repo/INDEX
+    done
+}
+
+check_pkg_installed() {
+    if [ -d $ROOT/var/packages/$1 ]; then
+        print_error "Package '$1' already installed."
+        exit 1
+    fi
+}
+
+check_pkg_installed_no_exit() {
+    PACKAGE_INSTALLED=false
+    if [ -d $ROOT/var/packages/$1 ]; then
+        PACKAGE_INSTALLED=true
+    fi
+}
+
+download_file() {
+    if [ -f $1 ]; then
+        cp $1 $2
+    else
+        curl -s -o $2 $1
+        if [ $? != 0 ]; then
+            rm $2
+            print_error "An error occured during the download !"
+            exit 1
+        fi
+    fi
+}
+
+download_pkg() {
+    check_pkg_installed_no_exit $1
+    check_pkg_or_list_exists $1
+    if $PACKAGE_INSTALLED; then
+        return
+    fi
+    get_repo_url $PACKAGE_REPO
+    PACKAGE_URL=$REPO_URL/$PACKAGE_SUBPATH
+    [ -f $ROOT/var/squirrel/cache/${1}_PKGINDEX ] && return
+    download_file $(dirname $PACKAGE_URL)/.PKGINDEX $ROOT/var/squirrel/cache/${1}_PKGINDEX 
+    read_deps_from_index $ROOT/var/squirrel/cache/${1}_PKGINDEX
+    for dep in ${deps[@]}; do
+        if [ "$dep" != "$1" ]; then
+            download_pkg $dep
+        fi
+    done
+    print_info "Downloading $1..."
+    check_pkg_installed_no_exit $1
+    check_pkg_or_list_exists $1
+    get_repo_url $PACKAGE_REPO
+    PACKAGE_URL=$REPO_URL/$PACKAGE_SUBPATH
+    download_file $PACKAGE_URL $ROOT/var/squirrel/cache/$(basename $PACKAGE_URL)
+    print_success "Download succeeded !"
+}
+
+get_repo_lists() {
+    mkdir -p $ROOT/var/squirrel/lists/
+    while IFS= read -r line; do
+        if [[ "$line" != *".tar.zst" ]]; then
+            download_file $REPO_URL/$line.txt $ROOT/var/squirrel/lists/$line
+        fi
+    done < $ROOT/var/squirrel/repos/$REPO_NAME/INDEX
+}
+get_repo_url() {
+    while IFS= read -r line; do
+        if [[ "$line" == "$1 "* ]]; then
+            REPO_URL=$(echo $line | cut -d ' ' -f 2)
+        fi
+    done < $CONF_PATH
+}
+
+install_pkg() {
+    read_deps_from_index $ROOT/var/squirrel/cache/${1}_PKGINDEX
+    rm $ROOT/var/squirrel/cache/${1}_PKGINDEX
+    for dep in ${deps[@]}; do
+        check_pkg_installed_no_exit $dep
+        if [ "$dep" != "$1" ] && ! $PACKAGE_INSTALLED; then
+            install_pkg $dep
+        fi
+    done
+    check_pkg_installed_no_exit $1
+    check_pkg_or_list_exists $1
+    get_repo_url $PACKAGE_REPO
+    PACKAGE_URL=$REPO_URL/$PACKAGE_SUBPATH
+    ROOT=$ROOT CONF_PATH=$CONF_PATH squirrel install $ROOT/var/squirrel/cache/$(basename $PACKAGE_URL) -i
+    rm $ROOT/var/squirrel/cache/$(basename $PACKAGE_URL)
+}
+
+sync() {
+    print_info "Syncing repos..."
+    while IFS= read -r line; do
+        REPO_NAME=$(echo $line | cut -d ' ' -f 1)
+        REPO_URL=$(echo $line | cut -d ' ' -f 2)
+
+        mkdir -p $ROOT/var/squirrel/repos/$REPO_NAME
+        download_file $REPO_URL/INDEX $ROOT/var/squirrel/repos/$REPO_NAME/INDEX
+        get_repo_lists $REPO_NAME
+    done < $CONF_PATH
+    print_success "Done !"
+}
+
 if [ "$ROOT" == "" ]; then
     ROOT="/"
+fi
+
+if [ "$CONF_PATH" == "" ]; then
+    CONF_PATH=$ROOT/etc/squirrel.conf
 fi
 
 case $1 in
@@ -48,19 +169,80 @@ case $1 in
             PACKAGE_VERSION=$(echo $PACKAGE | cut -d "-" -f 1 | rev)
             PACKAGE_NAME=$(echo $PACKAGE | rev | sed "s/-$PACKAGE_VERSION//")
 
-            if [ -d $ROOT/var/packages/$PACKAGE_NAME ]; then
-                print_error "Package '$PACKAGE_NAME' already installed."
-                exit 1
-            fi
-
-            tar -xf $2 .PKGINDEX
+            check_pkg_installed $PACKAGE_NAME
+            
+            tar -xf $2 ./.PKGINDEX
             read_deps_from_index ./.PKGINDEX
 
-            for dep in ${deps[@]}; do
-                squirrel install $dep
+            if [ "${@: -1}" != "-i" ]; then
+                for dep in ${deps[@]}; do
+                    if [ "$dep" != "$PACKAGE_NAME" ]; then
+                        ROOT=$ROOT CONF_PATH=$CONF_PATH squirrel install $dep
+                    fi
+                done
+            fi
+
+            ROOT=$ROOT stadd $2
+        else
+            mkdir -p $ROOT/var/squirrel/cache/
+            ALL_PACKAGES_INSTALLED=true
+            for pkg in ${@:2}; do
+                check_pkg_installed_no_exit $pkg
+                if ! $PACKAGE_INSTALLED; then
+                    ALL_PACKAGES_INSTALLED=false
+                fi
+
+                check_pkg_or_list_exists $pkg
+                if [ "$PACKAGE_TYPE" == "none" ]; then
+                    print_error "Package '$pkg' does not exist !"
+                    exit 1
+                fi
             done
-            
-            stadd $2
+            if ! $ALL_PACKAGES_INSTALLED; then
+                for pkg in ${@:2}; do
+                    check_pkg_or_list_exists $pkg
+                    if [ "$PACKAGE_TYPE" == "pkg" ]; then
+                        download_pkg $pkg
+                    fi
+
+                    if [ "$PACKAGE_TYPE" == "list" ]; then
+                        pkgs=()
+                        while IFS= read -r line; do
+                            pkgs+=($line)
+                        done < $ROOT/var/squirrel/lists/$2
+                        ROOT=$ROOT CONF_PATH=$CONF_PATH squirrel install ${pkgs[@]}
+                    fi
+                done
+                [ "$PACKAGE_TYPE" != "list" ] && echo ""
+                for pkg in ${@:2}; do
+                    check_pkg_installed_no_exit $pkg
+                    check_pkg_or_list_exists $pkg
+                    if $PACKAGE_INSTALLED; then
+                        continue
+                    fi
+                    [ "$PACKAGE_TYPE" == "list" ] && continue
+                    install_pkg $pkg
+                done
+            else
+                print_error "All the packages are already installed !"
+                exit
+            fi
         fi
         ;;
+
+    sync)
+        sync
+        ;;
 esac
+
+####### FUTURE CODE OF THE BUILD TOOL TO GENERATE THE INDEX FILE #######
+#for file in $(find -iname "*.tar.zst"); do
+#    PACKAGE=$(basename $file .tar.zst | rev)
+#    PACKAGE_VERSION=$(echo $PACKAGE | cut -d "-" -f 1 | rev)
+#    PACKAGE_NAME=$(echo $PACKAGE | rev | sed "s/-$PACKAGE_VERSION//")
+#    echo "$PACKAGE_NAME $PACKAGE_VERSION $file" >> INDEX
+#done
+#for file in $(find -iname "*.txt" -maxdepth 1); do
+#    echo "$(basename $file .txt)" >> INDEX
+#done
+
