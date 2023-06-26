@@ -25,7 +25,12 @@ print_help() {
     print_info "\t remove\e[0m  <package|list>\t\t Removes a package/list (and its not-used dependencies)."
     print_info "\t upgrade\e[0m [package|list]\t\t Upgrades all the installed packages on the system or just a package/list."
     print_info "\t info\e[0m    <package|list>\t\t Prints information about the specified package/list."
-    print_info "\t search\e[0m [-l|--list] <expression> Searches the packages or lists (with the -l option) containing the specified expression in their names."
+    print_info "\t search\e[0m <expression> [-l|--list] Searches the packages or lists (with the -l option) containing the specified expression in their names."
+    print_info "\t help\e[0m\t\t\t\t Shows this menu."
 }
 
-print_help
+case $1 in
+    help|-h|--help)
+        print_help
+    ;;
+esac
