@@ -32,5 +32,10 @@ print_help() {
 case $1 in
     help|-h|--help)
         print_help
-    ;;
+        ;;
+    install)
+        if [ -f $1 ]; then
+            stadd ./$1
+        fi
+        ;;
 esac
