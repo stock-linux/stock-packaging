@@ -6,3 +6,5 @@ install:
 	chmod +x $(DESTDIR)/usr/bin/stmk
 	cp scripts/stdel/stdel.sh $(DESTDIR)/usr/bin/stdel
 	chmod +x $(DESTDIR)/usr/bin/stdel
+	cp scripts/squirrel/squirrel.sh $(DESTDIR)/usr/bin/squirrel
+	chmod +x $(DESTDIR)/usr/bin/squirrel
