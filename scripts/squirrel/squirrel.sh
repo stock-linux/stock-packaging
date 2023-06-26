@@ -29,13 +29,38 @@ print_help() {
     print_info "\t help\e[0m\t\t\t\t Shows this menu."
 }
 
+read_deps_from_index() {
+    deps=()
+    IFS=',' read -r -a deps <<< "$(cat $1 | cut -d '|' -f 7)"
+}
+
+if [ "$ROOT" == "" ]; then
+    ROOT="/"
+fi
+
 case $1 in
     help|-h|--help)
         print_help
         ;;
     install)
-        if [ -f $1 ]; then
-            stadd ./$1
+        if [ -f $2 ]; then
+            PACKAGE=$(basename $2 .tar.zst | rev)
+            PACKAGE_VERSION=$(echo $PACKAGE | cut -d "-" -f 1 | rev)
+            PACKAGE_NAME=$(echo $PACKAGE | rev | sed "s/-$PACKAGE_VERSION//")
+
+            if [ -d $ROOT/var/packages/$PACKAGE_NAME ]; then
+                print_error "Package '$PACKAGE_NAME' already installed."
+                exit 1
+            fi
+
+            tar -xf $2 .PKGINDEX
+            read_deps_from_index ./.PKGINDEX
+
+            for dep in ${deps[@]}; do
+                squirrel install $dep
+            done
+            
+            stadd $2
         fi
         ;;
 esac
