@@ -30,12 +30,29 @@ print_help() {
     print_success "hazel"
     echo -e "\t <package|directory> [version]\t Builds a specific package or a whole directory containing multiple packages."
     print_info "\t new | -n\e[0m <path> <version>\t Creates a new package at the specified path and with the specified version."
+    print_info "\t build-index\e[0m\t\t Builds an INDEX of the current directory."
     print_info "\t help\e[0m\t\t\t\t Shows this menu."
+}
+
+build_index() {
+    rm -f INDEX
+    for file in $(find -iname "*.tar.zst"); do
+        PACKAGE_NAME=$(cat $(dirname $file)/.PKGINDEX | cut -d '|' -f 1)
+        PACKAGE_VERSION=$(cat $(dirname $file)/.PKGINDEX | cut -d '|' -f 2)
+        PACKAGE_RELEASE=$(cat $(dirname $file)/.PKGINDEX | cut -d '|' -f 3)
+        echo "$PACKAGE_NAME $PACKAGE_VERSION $PACKAGE_RELEASE $file" >> INDEX
+    done
+    for file in $(find -maxdepth 1 -iname "*.txt"); do
+        echo "$(basename $file .txt)" >> INDEX
+    done
 }
 
 case $1 in
     help|-h|--help)
         print_help
+        ;;
+    build-index)
+        build_index
         ;;
     *)
         if [ "$1" == "" ]; then
@@ -166,16 +183,7 @@ EOF
             cp $USERDIR/hazel/root/build/* $USERDIR/hazel/www/$PACKAGE_DIR_PATH/
             cp $USERDIR/hazel/root/build/.PKGINDEX $USERDIR/hazel/www/$PACKAGE_DIR_PATH/.PKGINDEX
             cd $USERDIR/hazel/www/
-            rm -f INDEX
-            for file in $(find -iname "*.tar.zst"); do
-                PACKAGE_NAME=$(cat $(dirname $file)/.PKGINDEX | cut -d '|' -f 1)
-                PACKAGE_VERSION=$(cat $(dirname $file)/.PKGINDEX | cut -d '|' -f 2)
-                PACKAGE_RELEASE=$(cat $(dirname $file)/.PKGINDEX | cut -d '|' -f 3)
-                echo "$PACKAGE_NAME $PACKAGE_VERSION $PACKAGE_RELEASE $file" >> INDEX
-            done
-            for file in $(find -maxdepth 1 -iname "*.txt"); do
-                echo "$(basename $file .txt)" >> INDEX
-            done
+            build_index
             cd $BASEDIR
             read -p 'Do you want to commit ? (Y/n) ' COMMIT
             if [ "$COMMIT" == "Y" ] || [ "$COMMIT" == "y" ]; then
