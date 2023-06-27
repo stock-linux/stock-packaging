@@ -8,3 +8,5 @@ install:
 	chmod +x $(DESTDIR)/usr/bin/stdel
 	cp scripts/squirrel/squirrel.sh $(DESTDIR)/usr/bin/squirrel
 	chmod +x $(DESTDIR)/usr/bin/squirrel
+	cp scripts/hazel/hazel.sh $(DESTDIR)/usr/bin/hazel
+	chmod +x $(DESTDIR)/usr/bin/hazel
