@@ -72,7 +72,7 @@ download_file() {
     if [ -f $1 ]; then
         cp $1 $2
     else
-        curl -s -o $2 $1
+        curl --progress-bar -s -o $2 $1
         if [ $? != 0 ]; then
             rm $2
             print_error "An error occured during the download !"
