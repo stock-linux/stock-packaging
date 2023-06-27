@@ -197,7 +197,7 @@ EOF
                 git commit -m "$name $version-$release"    
             fi
         else
-            cp $USERDIR/hazel/root/build/build.log $USERDIR/hazel/logs/$name-$version.log
+            sudo cp $USERDIR/hazel/root/build/build.log $USERDIR/hazel/logs/$name-$version.log
             exit 1
         fi
         ;;
