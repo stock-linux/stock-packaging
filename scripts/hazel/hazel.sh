@@ -106,8 +106,8 @@ case $1 in
         echo ""
         print_info "Setting up chroot..."
         echo ""
-        sudo CONF_PATH=/etc/squirrel.conf ROOT=$USERDIR/hazel/root squirrel sync
-        sudo CONF_PATH=/etc/squirrel.conf ROOT=$USERDIR/hazel/root squirrel install core
+        sudo CONF_PATH=$CONF_PATH ROOT=$USERDIR/hazel/root squirrel sync
+        sudo CONF_PATH=$CONF_PATH ROOT=$USERDIR/hazel/root squirrel install core
         echo ""
         print_success "Chroot successfully created !"
         echo ""
