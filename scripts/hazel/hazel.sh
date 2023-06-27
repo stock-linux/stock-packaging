@@ -113,6 +113,10 @@ case $1 in
         echo ""
         print_info "Downloading package sources..."
         source $PACKAGE_DIR_PATH/recipe
+        if [ "$2" != "" ]; then
+            sed -i "s/version=$version/version=$2" $PACKAGE_DIR_PATH/recipe
+        fi
+        sed -i "s/packager=$packager/packager=$USERNAME" $PACKAGE_DIR_PATH/recipe
         echo ""
         sudo mkdir -p $USERDIR/hazel/root/{sources,build}
         for sourceInfo in ${source[@]}; do
