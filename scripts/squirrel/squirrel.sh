@@ -42,7 +42,8 @@ check_pkg_or_list_exists() {
                 PACKAGE_TYPE="pkg"
                 PACKAGE_NAME=$(echo $line | cut -d ' ' -f 1)
                 PACKAGE_VERSION=$(echo $line | cut -d ' ' -f 2)
-                PACKAGE_SUBPATH=$(echo $line | cut -d ' ' -f 3)
+                PACKAGE_RELEASE=$(echo $line | cut -d ' ' -f 3)
+                PACKAGE_SUBPATH=$(echo $line | cut -d ' ' -f 4)
                 PACKAGE_REPO=$(basename $repo)
             fi
             if [[ "$line" == "$1" ]]; then
@@ -240,9 +241,10 @@ esac
 #    PACKAGE=$(basename $file .tar.zst | rev)
 #    PACKAGE_VERSION=$(echo $PACKAGE | cut -d "-" -f 1 | rev)
 #    PACKAGE_NAME=$(echo $PACKAGE | rev | sed "s/-$PACKAGE_VERSION//")
-#    echo "$PACKAGE_NAME $PACKAGE_VERSION $file" >> INDEX
+#    PACKAGE_RELEASE=$(cat $(dirname $file)/.PKGINDEX | cut -d '|' -f 3)
+#    echo "$PACKAGE_NAME $PACKAGE_VERSION $PACKAGE_RELEASE $file" >> INDEX
 #done
-#for file in $(find -iname "*.txt" -maxdepth 1); do
+#for file in $(find -maxdepth 1 -iname "*.txt"); do
 #    echo "$(basename $file .txt)" >> INDEX
 #done
 
