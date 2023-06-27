@@ -36,7 +36,11 @@ read_deps_from_index() {
 
 check_pkg_or_list_exists() {
     PACKAGE_TYPE="none"
-    for repo in $ROOT/var/squirrel/repos/*; do
+    REPOS=()
+    while IFS= read -r line; do
+        REPOS+=($(echo $line | cut -d ' ' -f 1))
+    done < $CONF_PATH
+    for repo in $REPOS; do
         while IFS= read -r line; do
             if [[ "$line" == "$1 "* ]]; then
                 PACKAGE_TYPE="pkg"
@@ -45,12 +49,14 @@ check_pkg_or_list_exists() {
                 PACKAGE_RELEASE=$(echo $line | cut -d ' ' -f 3)
                 PACKAGE_SUBPATH=$(echo $line | cut -d ' ' -f 4)
                 PACKAGE_REPO=$(basename $repo)
+                break 2
             fi
             if [[ "$line" == "$1" ]]; then
                 PACKAGE_TYPE="list"
                 PACKAGE_REPO=$(basename $repo)
+                break 2
             fi
-        done < $repo/INDEX
+        done < $ROOT/var/squirrel/repos/$repo/INDEX
     done
 }
 
