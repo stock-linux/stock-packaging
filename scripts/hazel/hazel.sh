@@ -124,7 +124,7 @@ case $1 in
         done
 
         echo ""
-        
+
         sudo cp $PACKAGE_DIR_PATH/* $USERDIR/hazel/root/build
         sudo cp $USERDIR/hazel/sources/* $USERDIR/hazel/root/sources
 
@@ -162,8 +162,21 @@ EOF
             echo ""
             mkdir -p $USERDIR/hazel/www/$PACKAGE_DIR_PATH
             sudo mv $USERDIR/hazel/root/build/build.log $USERDIR/hazel/logs/$name-$version.log
+            BASEDIR=$PWD
             cp $USERDIR/hazel/root/build/* $USERDIR/hazel/www/$PACKAGE_DIR_PATH/
             cp $USERDIR/hazel/root/build/.PKGINDEX $USERDIR/hazel/www/$PACKAGE_DIR_PATH/.PKGINDEX
+            cd $USERDIR/hazel/www/
+            rm -f INDEX
+            for file in $(find -iname "*.tar.zst"); do
+                PACKAGE_NAME=$(cat $(dirname $file)/.PKGINDEX | cut -d '|' -f 1)
+                PACKAGE_VERSION=$(cat $(dirname $file)/.PKGINDEX | cut -d '|' -f 2)
+                PACKAGE_RELEASE=$(cat $(dirname $file)/.PKGINDEX | cut -d '|' -f 3)
+                echo "$PACKAGE_NAME $PACKAGE_VERSION $PACKAGE_RELEASE $file" >> INDEX
+            done
+            for file in $(find -maxdepth 1 -iname "*.txt"); do
+                echo "$(basename $file .txt)" >> INDEX
+            done
+            cd $BASEDIR
             read -p 'Do you want to commit ? (Y/n) ' COMMIT
             if [ "$COMMIT" == "Y" ] || [ "$COMMIT" == "y" ]; then
                 git add $PACKAGE_DIR_PATH
