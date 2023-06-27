@@ -185,6 +185,7 @@ EOF
             mkdir -p $USERDIR/hazel/www/$PACKAGE_DIR_PATH
             sudo mv $USERDIR/hazel/root/build/build.log $USERDIR/hazel/logs/$name-$version.log
             BASEDIR=$PWD
+            rm $USERDIR/hazel/www/$PACKAGE_DIR_PATH/*
             cp $USERDIR/hazel/root/build/* $USERDIR/hazel/www/$PACKAGE_DIR_PATH/
             cp $USERDIR/hazel/root/build/.PKGINDEX $USERDIR/hazel/www/$PACKAGE_DIR_PATH/.PKGINDEX
             cd $USERDIR/hazel/www/
