@@ -117,6 +117,7 @@ case $1 in
             sed -i "s/version=$version/version=$2/" $PACKAGE_DIR_PATH/recipe
         fi
         sed -i "s/packager=$packager/packager=$USERNAME/" $PACKAGE_DIR_PATH/recipe
+        source $PACKAGE_DIR_PATH/recipe
         echo ""
         sudo mkdir -p $USERDIR/hazel/root/{sources,build}
         for sourceInfo in ${source[@]}; do
