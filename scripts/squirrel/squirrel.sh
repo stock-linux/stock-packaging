@@ -225,6 +225,10 @@ case $1 in
                     install_pkg $pkg
                 done
             else
+                if [ ${#@} == 2 ]; then
+                    print_error "Package '$2' is already installed !"
+                    exit
+                fi
                 print_error "All the packages are already installed !"
                 exit
             fi
@@ -238,9 +242,8 @@ esac
 
 ####### FUTURE CODE OF THE BUILD TOOL TO GENERATE THE INDEX FILE #######
 #for file in $(find -iname "*.tar.zst"); do
-#    PACKAGE=$(basename $file .tar.zst | rev)
-#    PACKAGE_VERSION=$(echo $PACKAGE | cut -d "-" -f 1 | rev)
-#    PACKAGE_NAME=$(echo $PACKAGE | rev | sed "s/-$PACKAGE_VERSION//")
+#    PACKAGE_NAME=$(cat $(dirname $file)/.PKGINDEX | cut -d '|' -f 1)
+#    PACKAGE_VERSION=$(cat $(dirname $file)/.PKGINDEX | cut -d '|' -f 2)
 #    PACKAGE_RELEASE=$(cat $(dirname $file)/.PKGINDEX | cut -d '|' -f 3)
 #    echo "$PACKAGE_NAME $PACKAGE_VERSION $PACKAGE_RELEASE $file" >> INDEX
 #done
