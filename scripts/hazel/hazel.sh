@@ -47,6 +47,10 @@ build_index() {
     done
 }
 
+if [ "$CONF_PATH" == "" ]; then
+    CONF_PATH=/etc/squirrel.conf
+fi
+
 case $1 in
     help|-h|--help)
         print_help
@@ -153,7 +157,7 @@ case $1 in
         if [ "$makedepends" != "" ]; then
             print_info "Installing build-time dependencies..."
             for makedep in ${makedepends[@]}; do
-                sudo CONF_PATH=/etc/squirrel.conf ROOT=$USERDIR/hazel/root squirrel install $makedep
+                sudo CONF_PATH=$CONF_PATH ROOT=$USERDIR/hazel/root squirrel install $makedep
             done
         fi
 
