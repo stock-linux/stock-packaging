@@ -137,6 +137,10 @@ case $1 in
             if [ -f $USERDIR/hazel/sources/$FILENAME ]; then
                 continue
             fi
+            if [ -f $PACKAGE_DIR_PATH/$FILENAME ]; then
+                cp $PACKAGE_DIR_PATH/$FILENAME $USERDIR/hazel/sources/$FILENAME
+                continue
+            fi
             print_info "Downloading $FILENAME..."
             sudo curl --progress-bar -L -s -o $USERDIR/hazel/sources/$FILENAME $URL
             if [ $? != 0 ]; then
