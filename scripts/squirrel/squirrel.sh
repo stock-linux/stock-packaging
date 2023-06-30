@@ -40,7 +40,7 @@ check_pkg_or_list_exists() {
     while IFS= read -r line; do
         REPOS+=($(echo $line | cut -d ' ' -f 1))
     done < $CONF_PATH
-    for repo in $REPOS; do
+    for repo in ${REPOS[@]}; do
         while IFS= read -r line; do
             if [[ "$line" == "$1 "* ]]; then
                 PACKAGE_TYPE="pkg"
