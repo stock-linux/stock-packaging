@@ -102,7 +102,8 @@ case $1 in
             print_error "Package '$1' not found !"
             exit 1
         fi
-
+        print_info "Pulling changes from remote repo."
+        git pull --rebase
         print_info "Cleaning up build root directory..."
         USERDIR=$HOME
         sudo rm -rf $USERDIR/hazel/root/*
