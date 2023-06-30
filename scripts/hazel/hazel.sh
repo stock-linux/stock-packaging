@@ -103,7 +103,7 @@ case $1 in
             exit 1
         fi
         print_info "Pulling changes from remote repo."
-        [ -f .PKGINDEX ] && rm .PKGINDEX
+        [ -f .PKGINDEX ] && sudo rm .PKGINDEX
         git pull --rebase
         print_info "Cleaning up build root directory..."
         USERDIR=$HOME
