@@ -106,8 +106,9 @@ case $1 in
         cat > $2/recipe << EOF
 name=$(basename $2)
 version=$3
+release=1
 description='${@:5}'
-source=($4)
+source=($(echo $4 | sed "s/$3/\$version/g" | sed "s/$2/\$name/g"))
 packager=$USERNAME
 EOF
 
