@@ -95,6 +95,11 @@ case $1 in
             exit
         fi
 
+        if [ "$EDITOR" == "" ]; then
+            print_error "The EDITOR variable should be defined."
+            exit 1
+        fi
+
         check_env
 
         mkdir -p $2
