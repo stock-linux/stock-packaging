@@ -24,13 +24,42 @@ init() {
     mkdir -p ~/hazel/root
 }
 
+check_env() {
+    USERNAME=$(git config user.name)
+    if [ ! -d ~/hazel ]; then
+        print_info "Initializing hazel..."
+        init
+        print_success "Done !"
+    fi
+
+    if [ ! -f /bin/curl ] && [ ! -f /usr/bin/curl ]; then
+        print_error "You must install curl..."
+        exit 1
+    fi
+    
+    if [ ! -f /bin/squirrel ] && [ ! -f /usr/bin/squirrel ]; then
+        print_error "You must install squirrel..."
+        exit 1
+    fi
+    
+    if [ ! -d .git ]; then
+        print_error "You're not in a git repo !"
+        exit 1
+    fi
+
+    if [ "$USERNAME" == "" ]; then
+        print_error "Your git username is not defined ! Please review your git config."
+        exit 1
+    fi
+}
+
 print_help() {
     echo "Usage:"
     echo ""
     print_success "hazel"
     echo -e "\t <package|directory> [version]\t Builds a specific package or a whole directory containing multiple packages."
-    print_info "\t new | -n\e[0m <path> <version>\t Creates a new package at the specified path and with the specified version."
-    print_info "\t build-index\e[0m\t\t Builds an INDEX of the current directory."
+    print_info "\t new | -n\e[0m <path> <version> <source> <description> Creates a new package at the specified path and with the specified version."
+    print_info "\t build-index\e[0m\t\t\t Builds an INDEX of the current directory."
     print_info "\t help\e[0m\t\t\t\t Shows this menu."
 }
 
@@ -55,41 +84,38 @@ case $1 in
     help|-h|--help)
         print_help
         ;;
+
     build-index)
         build_index
         ;;
+
+    new|-n)
+        if [ "$2" == "" ] || [ "$3" == "" ] || [ "$4" == "" ] || [ "$5" == "" ]; then
+            print_help
+            exit
+        fi
+
+        check_env
+
+        mkdir -p $2
+        cat > $2/recipe << EOF
+name=$(basename $2)
+version=$3
+description='${@:5}'
+source=($4)
+packager=$USERNAME
+EOF
+
+        eval "$EDITOR $2/recipe"
+        ;;
+
     *)
         if [ "$1" == "" ]; then
             print_help
             exit
         fi
 
-        USERNAME=$(git config user.name)
-        if [ ! -d ~/hazel ]; then
-            print_info "Initializing hazel..."
-            init
-            print_success "Done !"
-        fi
-
-        if [ ! -f /bin/curl ] && [ ! -f /usr/bin/curl ]; then
-            print_error "You must install curl..."
-            exit 1
-        fi
-        
-        if [ ! -f /bin/squirrel ] && [ ! -f /usr/bin/squirrel ]; then
-            print_error "You must install squirrel..."
-            exit 1
-        fi
-        
-        if [ ! -d .git ]; then
-            print_error "You're not in a git repo !"
-            exit 1
-        fi
-
-        if [ "$USERNAME" == "" ]; then
-            print_error "Your git username is not defined ! Please review your git config."
-            exit 1
-        fi
+        check_env
         
         PACKAGE_DIR_PATH=""
         for dir in $(find -type d); do
