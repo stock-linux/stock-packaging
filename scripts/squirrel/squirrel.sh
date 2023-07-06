@@ -245,15 +245,3 @@ case $1 in
         sync
         ;;
 esac
-
-####### FUTURE CODE OF THE BUILD TOOL TO GENERATE THE INDEX FILE #######
-#for file in $(find -iname "*.tar.zst"); do
-#    PACKAGE_NAME=$(cat $(dirname $file)/.PKGINDEX | cut -d '|' -f 1)
-#    PACKAGE_VERSION=$(cat $(dirname $file)/.PKGINDEX | cut -d '|' -f 2)
-#    PACKAGE_RELEASE=$(cat $(dirname $file)/.PKGINDEX | cut -d '|' -f 3)
-#    echo "$PACKAGE_NAME $PACKAGE_VERSION $PACKAGE_RELEASE $file" >> INDEX
-#done
-#for file in $(find -maxdepth 1 -iname "*.txt"); do
-#    echo "$(basename $file .txt)" >> INDEX
-#done
-
