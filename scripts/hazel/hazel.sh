@@ -102,17 +102,12 @@ case $1 in
 
         check_env
 
-        mkdir -p $2
-        cat > $2/recipe << EOF
-name=$(basename $2)
-version=$3
-release=1
-description='${@:5}'
-source=($(echo $4 | sed "s/$3/\$version/g" | sed "s/$2/\$name/g"))
-packager=$USERNAME
-EOF
+        mkdir -p $(dirname $2)
+        cd $(dirname $2)
 
-        eval "$EDITOR $2/recipe"
+        PACKAGER=$USERNAME stmk c $(basename $2) $3 $4 ${@:5}
+
+        eval "$EDITOR $(basename $2)/recipe"
         ;;
 
     *)
