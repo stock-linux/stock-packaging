@@ -64,7 +64,8 @@ print_help() {
 }
 
 build_index() {
-    rm -f INDEX
+    [ -f /tmp/INDEX ] && rm -f /tmp/INDEX
+
     for file in $(find -iname "*.tar.zst"); do
         PACKAGE_NAME=$(cat $(dirname $file)/.PKGINDEX | cut -d '|' -f 1)
         PACKAGE_VERSION=$(cat $(dirname $file)/.PKGINDEX | cut -d '|' -f 2)
@@ -72,8 +73,9 @@ build_index() {
         echo "$PACKAGE_NAME $PACKAGE_VERSION $PACKAGE_RELEASE $file" >> INDEX
     done
     for file in $(find -maxdepth 1 -iname "*.txt"); do
-        echo "$(basename $file .txt)" >> INDEX
+        echo "$(basename $file .txt)" >> /tmp/INDEX
     done
+    cp /tmp/INDEX INDEX
 }
 
 if [ "$CONF_PATH" == "" ]; then
