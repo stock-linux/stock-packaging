@@ -70,7 +70,7 @@ build_index() {
         PACKAGE_NAME=$(cat $(dirname $file)/.PKGINDEX | cut -d '|' -f 1)
         PACKAGE_VERSION=$(cat $(dirname $file)/.PKGINDEX | cut -d '|' -f 2)
         PACKAGE_RELEASE=$(cat $(dirname $file)/.PKGINDEX | cut -d '|' -f 3)
-        echo "$PACKAGE_NAME $PACKAGE_VERSION $PACKAGE_RELEASE $file" >> INDEX
+        echo "$PACKAGE_NAME $PACKAGE_VERSION $PACKAGE_RELEASE $file" >> /tmp/INDEX
     done
     for file in $(find -maxdepth 1 -iname "*.txt"); do
         echo "$(basename $file .txt)" >> /tmp/INDEX
