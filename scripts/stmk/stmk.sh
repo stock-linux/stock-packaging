@@ -97,6 +97,16 @@ build() {
     fi
 }
 
+build_meson() {
+    mkdir build
+    cd    build
+
+    meson setup --prefix=/usr --buildtype=release .. &&
+    ninja
+
+    DESTDIR=$PKG ninja install
+}
+
 build_python() {
     python setup.py build
     python setup.py install --root=$PKG
