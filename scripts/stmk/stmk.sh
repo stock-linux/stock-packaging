@@ -147,6 +147,7 @@ strip_files() {
 read_elf_deps() {
     cd $PKG
     DEPS=()
+    READ_LIBS=()
     for file in $(find);
     do
         FILETYPE=$(file $file | cut -d ' ' -f 2)
@@ -154,6 +155,12 @@ read_elf_deps() {
             ARCH=$(file $file | cut -d ' ' -f 3)
             LIBRARIES=$(readelf -d $file | grep 'NEEDED' | cut -d ':' -f 2 | cut -d '[' -f 2 | cut -d ']' -f 1)
             for library in $LIBRARIES; do
+                for lib in "${READ_LIBS[@]}"; do
+                    if [ "$lib" == "$library" ]; then
+                        continue 2
+                    fi
+                done
+                READ_LIBS+=($library)
                 for package in /var/packages/*;
                 do
                     PACKAGE_NAME=$(basename $package)
@@ -168,7 +175,6 @@ read_elf_deps() {
                                 continue 2
                             fi
                         done
-
                         DEPS+=($PACKAGE_NAME)
                     fi
                 done
