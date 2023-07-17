@@ -59,23 +59,34 @@ print_help() {
     print_success "hazel"
     echo -e "\t <package|directory> [version]\t Builds a specific package or a whole directory containing multiple packages."
     print_info "\t new | -n\e[0m <path> <version> <source> <description> Creates a new package at the specified path and with the specified version."
-    print_info "\t build-index\e[0m\t\t\t Builds an INDEX of the current directory."
+    print_info "\t build-index\e[0m <package>\t\t Builds an INDEX of the current directory."
     print_info "\t help\e[0m\t\t\t\t Shows this menu."
 }
 
 build_index() {
-    [ -f /tmp/INDEX ] && rm -f /tmp/INDEX
+    if [ "$PACKAGE_DIR_PATH" != "" ]; then
+        cp INDEX /tmp/INDEX
+        for file in $(find -iname "*.tar.zst" $PACKAGE_DIR_PATH); do
+            PACKAGE_NAME=$(cat $(dirname $file)/.PKGINDEX | cut -d '|' -f 1)
+            PACKAGE_VERSION=$(cat $(dirname $file)/.PKGINDEX | cut -d '|' -f 2)
+            PACKAGE_RELEASE=$(cat $(dirname $file)/.PKGINDEX | cut -d '|' -f 3)
+            grep -v "$PACKAGE_NAME " /tmp/INDEX > INDEX
+            echo "$PACKAGE_NAME $PACKAGE_VERSION $PACKAGE_RELEASE $file" >> INDEX
+        done
+    else
+        [ -f /tmp/INDEX ] && rm -f /tmp/INDEX
 
-    for file in $(find -iname "*.tar.zst"); do
-        PACKAGE_NAME=$(cat $(dirname $file)/.PKGINDEX | cut -d '|' -f 1)
-        PACKAGE_VERSION=$(cat $(dirname $file)/.PKGINDEX | cut -d '|' -f 2)
-        PACKAGE_RELEASE=$(cat $(dirname $file)/.PKGINDEX | cut -d '|' -f 3)
-        echo "$PACKAGE_NAME $PACKAGE_VERSION $PACKAGE_RELEASE $file" >> /tmp/INDEX
-    done
-    for file in $(find -maxdepth 1 -iname "*.txt"); do
-        echo "$(basename $file .txt)" >> /tmp/INDEX
-    done
-    cp /tmp/INDEX INDEX
+        for file in $(find -iname "*.tar.zst"); do
+            PACKAGE_NAME=$(cat $(dirname $file)/.PKGINDEX | cut -d '|' -f 1)
+            PACKAGE_VERSION=$(cat $(dirname $file)/.PKGINDEX | cut -d '|' -f 2)
+            PACKAGE_RELEASE=$(cat $(dirname $file)/.PKGINDEX | cut -d '|' -f 3)
+            echo "$PACKAGE_NAME $PACKAGE_VERSION $PACKAGE_RELEASE $file" >> /tmp/INDEX
+        done
+        for file in $(find -maxdepth 1 -iname "*.txt"); do
+            echo "$(basename $file .txt)" >> /tmp/INDEX
+        done
+        cp /tmp/INDEX INDEX
+    fi
 }
 
 if [ "$CONF_PATH" == "" ]; then
@@ -87,7 +98,7 @@ case $1 in
         print_help
         ;;
 
-    build-index)
+    build-index)  
         build_index
         ;;
 
