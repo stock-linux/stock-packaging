@@ -66,7 +66,7 @@ print_help() {
 build_index() {
     if [ "$PACKAGE_DIR_PATH" != "" ]; then
         cp INDEX /tmp/INDEX
-        for file in $(find -iname "*.tar.zst" $PACKAGE_DIR_PATH); do
+        for file in $(find $PACKAGE_DIR_PATH -iname "*.tar.zst"); do
             PACKAGE_NAME=$(cat $(dirname $file)/.PKGINDEX | cut -d '|' -f 1)
             PACKAGE_VERSION=$(cat $(dirname $file)/.PKGINDEX | cut -d '|' -f 2)
             PACKAGE_RELEASE=$(cat $(dirname $file)/.PKGINDEX | cut -d '|' -f 3)
