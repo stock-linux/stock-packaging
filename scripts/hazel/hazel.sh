@@ -147,7 +147,9 @@ case $1 in
         git pull --rebase
         print_info "Cleaning up build root directory..."
         USERDIR=$HOME
-        sudo rm -rf $USERDIR/hazel/root/*
+        if [ "$KEEP_CHROOT" != "1" ]; then
+            sudo rm -rf $USERDIR/hazel/root/*
+        fi
         print_success "Done !"
         echo ""
         print_info "Setting up chroot..."
