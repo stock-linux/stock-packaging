@@ -182,7 +182,7 @@ case $1 in
                 continue
             fi
             if [ -f $PACKAGE_DIR_PATH/$FILENAME ]; then
-                cp $PACKAGE_DIR_PATH/$FILENAME $USERDIR/hazel/sources/$FILENAME
+                sudo cp $PACKAGE_DIR_PATH/$FILENAME $USERDIR/hazel/sources/$FILENAME
                 continue
             fi
             print_info "Downloading $FILENAME..."
