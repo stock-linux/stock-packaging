@@ -82,6 +82,7 @@ unpack() {
 
 build() {
     if [[ "$name" == "lib32"* ]]; then
+        export PKG_CONFIG_PATH="/usr/lib32/pkgconfig"
         CFLAGS+=" -m32" CXXFLAGS+=" -m32" \
         ./configure --prefix=/usr \
             --libdir=/usr/lib32 --disable-static || CFLAGS+=" -m32" CXXFLAGS+=" -m32" ./configure --prefix=/usr --libdir=/usr/lib32
