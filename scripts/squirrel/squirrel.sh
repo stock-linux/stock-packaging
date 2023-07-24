@@ -239,6 +239,14 @@ case $1 in
                 exit
             fi
         fi
+
+        if [ -f $ROOT/usr/bin/gtk-update-icon-cache ]; then
+            chroot $ROOT /usr/bin/gtk-update-icon-cache -f -t /usr/share/icons/hicolor &> /dev/null
+        fi
+
+        if [ -f $ROOT/usr/bin/glib-compile-schemas ]; then
+            chroot $ROOT /usr/bin/glib-compile-schemas /usr/share/glib-2.0/schemas &> /dev/null
+        fi
         ;;
 
     sync)
