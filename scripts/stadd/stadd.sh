@@ -76,6 +76,11 @@ fi
 mkdir -p $ROOT/var/packages/$PACKAGE_NAME
 mv .FILETREE $ROOT/var/packages/$PACKAGE_NAME/FILETREE
 mv .PKGINDEX $ROOT/var/packages/$PACKAGE_NAME/PKGINDEX
+
+if [ -f $ROOT/usr/bin/gtk-update-icon-cache ]; then
+    chroot $ROOT /usr/bin/gtk-update-icon-cache -f -t /usr/share/icons/hicolor
+fi
+
 if [ -f $ROOT/.post-install ]; then
     chmod +x $ROOT/.post-install
     chroot $ROOT /.post-install
