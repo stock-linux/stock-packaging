@@ -70,7 +70,7 @@ build_index() {
             PACKAGE_NAME=$(cat $(dirname $file)/.PKGINDEX | cut -d '|' -f 1)
             PACKAGE_VERSION=$(cat $(dirname $file)/.PKGINDEX | cut -d '|' -f 2)
             PACKAGE_RELEASE=$(cat $(dirname $file)/.PKGINDEX | cut -d '|' -f 3)
-            grep -v "$PACKAGE_NAME " /tmp/INDEX > INDEX
+            grep -v "^$PACKAGE_NAME " /tmp/INDEX > INDEX
             echo "$PACKAGE_NAME $PACKAGE_VERSION $PACKAGE_RELEASE $file" >> INDEX
         done
     else
